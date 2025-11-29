@@ -9,19 +9,20 @@ def _extract_from_pdf(file_bytes: bytes) -> str:
     text = ""
     with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
         for page in pdf.pages:
-            text += page.extract_text() or ""
+            page_text = page.extract_text() or ""
+            text += page_text + "\n"
     return text
 
 
 def _extract_from_docx(file_bytes: bytes) -> str:
     file_stream = io.BytesIO(file_bytes)
-    doc = docx.Document(file_stream)
-    return "\n".join(p.text for p in doc.paragraphs)
+    document = docx.Document(file_stream)
+    return "\n".join(p.text for p in document.paragraphs)
 
 
 def extract_resume_text(uploaded_file) -> Optional[str]:
     """
-    Takes a Streamlit UploadedFile and returns plain text from the resume.
+    Takes a Streamlit UploadedFile and returns plain text.
     Supports PDF and DOCX. Returns None for unsupported types.
     """
     if uploaded_file is None:
