@@ -1,7 +1,6 @@
 import re
 from collections import Counter
-from typing import Dict, List
-
+from typing import Dict, List, Tuple
 
 STOPWORDS = {
     "the", "and", "or", "to", "of", "in", "for", "on", "a", "an", "with",
@@ -19,8 +18,8 @@ def _tokenize(text: str) -> List[str]:
 
 def analyze_match(resume_text: str, jd_text: str) -> Dict:
     """
-    Very simple ATS-style keyword analysis.
-    You can improve this later, but this is enough for V1.
+    Simple ATS-style keyword analysis.
+    Not perfect, but enough to show understanding of matching logic.
     """
     resume_tokens = _tokenize(resume_text)
     jd_tokens = _tokenize(jd_text)
@@ -31,17 +30,16 @@ def analyze_match(resume_text: str, jd_text: str) -> Dict:
     matched = sorted(jd_set & resume_set)
     missing = sorted(jd_set - resume_set)
 
-    # crude scoring
     if not jd_set:
         score = 0
     else:
         score = round(len(matched) / len(jd_set) * 100)
 
-    resume_freq = Counter(resume_tokens)
+    resume_freq: List[Tuple[str, int]] = Counter(resume_tokens).most_common(20)
 
     return {
         "score": score,
         "matched_keywords": matched,
         "missing_keywords": missing,
-        "resume_keyword_frequency": resume_freq.most_common(15)
+        "resume_keyword_frequency": resume_freq,
     }
