@@ -1,5 +1,6 @@
 from typing import Optional
 import io
+
 import pdfplumber
 
 
@@ -15,14 +16,14 @@ def extract_jd_text(uploaded_file, jd_text_manual: str) -> Optional[str]:
     if uploaded_file is None:
         return None
 
-    name = uploaded_file.name.lower()
     file_bytes = uploaded_file.read()
+    name = uploaded_file.name.lower()
 
     if name.endswith(".pdf"):
         text = ""
         with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
             for page in pdf.pages:
-                text += page.extract_text() or ""
+                text += (page.extract_text() or "") + "\n"
         return text
 
     if name.endswith(".txt"):
